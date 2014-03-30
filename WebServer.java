@@ -39,6 +39,7 @@ public class WebServer {
             os.write(" a message of your choosing ".getBytes()); 
  
         conn.close();
+            }
     }
 
     public static void main (String[] args) throws IOException {
