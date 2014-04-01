@@ -25,12 +25,24 @@ public class WebServer {
         this.logging = logging;
     }
 
-    public void start() throws IOException {
+    public void start() throws IOException, MessageFormatException {
         // create a server socket 
         ServerSocket serverSock = new ServerSocket(port); 
             while (true) { 
             // listen for a new connection on the server socket 
             Socket conn = serverSock.accept(); 
+             //examine byte stream sent by client
+            InputStream is = conn.getInputStream();
+            //extract HTTP message from stream
+            RequestMessage req = RequestMessage.parse(is);
+            String methName = req.getMethod();
+            String URI = req.getURI();
+            if ("GET".equals(methName)){
+                ResponseMessage msg = new ResponseMessage(200); 
+            }
+            else{
+               ResponseMessage msg = new ResponseMessage(500);  
+            }
             // get the output stream for sending data to the client 
             OutputStream os = conn.getOutputStream(); 
             // send a response 
@@ -42,7 +54,7 @@ public class WebServer {
             }
     }
 
-    public static void main (String[] args) throws IOException {
+    public static void main (String[] args) throws IOException, MessageFormatException {
         String usage = "Usage: java webserver.WebServer <port-number> <root-dir> (\"0\" | \"1\")";
         if (args.length != 3) {
             throw new Error(usage);
