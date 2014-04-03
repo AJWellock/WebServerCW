@@ -40,10 +40,10 @@ public class WebServer {
             if ("GET".equals(methName)){
                 ResponseMessage msg = new ResponseMessage(200); 
             }
-            if ("PUT".equals(methName)){
+            if ("HEAD".equals(methName)){
                 ResponseMessage msg = new ResponseMessage(200); 
             }
-            if ("PULL".equals(methName)){
+            if ("PUT".equals(methName)){
                 ResponseMessage msg = new ResponseMessage(200);
             }
             else{
