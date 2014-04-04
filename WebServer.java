@@ -2,16 +2,15 @@ package webserver;
 
 import in2011.http.RequestMessage;
 import in2011.http.ResponseMessage;
-import in2011.http.StatusCodes;
-import in2011.http.EmptyMessageException;
 import in2011.http.MessageFormatException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
-import java.nio.*;
-import java.util.Date;
-import org.apache.http.client.utils.DateUtils;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.*;
 
 public class WebServer {
 
@@ -35,23 +34,29 @@ public class WebServer {
             InputStream is = conn.getInputStream();
             //extract HTTP message from stream
             RequestMessage req = RequestMessage.parse(is);
+            OutputStream os = conn.getOutputStream(); 
+
             String methName = req.getMethod();
             String URI = req.getURI();
             if ("GET".equals(methName)){
                 ResponseMessage msg = new ResponseMessage(200); 
+            String uri =  URLDecoder.decode(URI,"ASCII");
+            Path path = Paths.get(rootDir).resolve(uri).normalize(); 
+            if (!path.startsWith(Paths.get(rootDir))){//bad path}
+            byte[] b = Files.readAllBytes(path);
+            os.write(b);
+            }
             }
             if ("HEAD".equals(methName)){
                 ResponseMessage msg = new ResponseMessage(200); 
             }
             if ("PUT".equals(methName)){
-                ResponseMessage msg = new ResponseMessage(200);
+                ResponseMessage msg = new ResponseMessage(201);
             }
             else{
                ResponseMessage msg = new ResponseMessage(500);  
             }
             // get the output stream for sending data to the client 
-            OutputStream os = conn.getOutputStream(); 
-            // send a response 
             ResponseMessage msg = new ResponseMessage(200); 
             msg.write(os); 
             os.write(" a message of your choosing ".getBytes()); 
