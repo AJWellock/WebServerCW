@@ -42,10 +42,14 @@ public class WebServer {
                 ResponseMessage msg = new ResponseMessage(200); 
             String uri =  URLDecoder.decode(URI,"ASCII");
             Path path = Paths.get(rootDir).resolve(uri).normalize(); 
-            if (!path.startsWith(Paths.get(rootDir))){//bad request}
+            if (!path.startsWith(Paths.get(rootDir))){
+            ResponseMessage msgBroken = new ResponseMessage(400); 
+            msg.write(os); 
+            os.write(" Request is bad ".getBytes());
+            }
             byte[] b = Files.readAllBytes(path);
             os.write(b);
-            }
+            
             if (path.startsWith(rootDir)&& !uri.equals(URI)){
                 Path p1 = Paths.get(System.getProperty("user.home"),uri).normalize();
                 byte[] a = Files.readAllBytes(p1);
@@ -67,7 +71,8 @@ public class WebServer {
             os.write(" a message of your choosing ".getBytes()); 
  
         conn.close();
-            }
+        }
+
     }
 
     public static void main (String[] args) throws IOException, MessageFormatException {
