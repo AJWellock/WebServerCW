@@ -38,7 +38,7 @@ public class WebServer {
 
             String methName = req.getMethod();
             String URI = req.getURI();
-            if ("GET".equals(methName){
+            if ("GET".equals(methName)){
                 ResponseMessage msg = new ResponseMessage(200); 
             String uri =  URLDecoder.decode(URI,"ASCII");
             Path path = Paths.get(rootDir).resolve(uri).normalize(); 
