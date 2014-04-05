@@ -42,9 +42,14 @@ public class WebServer {
                 ResponseMessage msg = new ResponseMessage(200); 
             String uri =  URLDecoder.decode(URI,"ASCII");
             Path path = Paths.get(rootDir).resolve(uri).normalize(); 
-            if (!path.startsWith(Paths.get(rootDir))){//bad path}
+            if (!path.startsWith(Paths.get(rootDir))){//bad request}
             byte[] b = Files.readAllBytes(path);
             os.write(b);
+            }
+            if (path.startsWith(rootDir)&& !uri.equals(URI)){
+                Path p1 = Paths.get(System.getProperty("user.home"),uri).normalize();
+                byte[] a = Files.readAllBytes(p1);
+                os.write(a);              
             }
             }
             if ("HEAD".equals(methName)){
