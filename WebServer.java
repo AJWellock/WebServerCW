@@ -84,7 +84,7 @@ public class WebServer {
                 head.getHeaderFieldValue("Server");
                
                 head.write(os);
-                //os.write(" Weclome to Group 42 server ".getBytes());;
+                
                 
 
                 conn.close();
@@ -107,7 +107,7 @@ public class WebServer {
                 putfile.close();
                 ResponseMessage putresp = new ResponseMessage(201);
                 putresp.write(os);
-                //os.write(" Weclome to Group 42 server ".getBytes());
+                
 
                 
                 conn.close();
@@ -116,7 +116,6 @@ public class WebServer {
             else{
                ResponseMessage msg = new ResponseMessage(500);  
             }
-            // get the output stream for sending data to the client 
             ResponseMessage msg = new ResponseMessage(200); 
             msg.write(os); 
             os.write("Team 23: ".getBytes()); 
