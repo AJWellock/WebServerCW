@@ -118,7 +118,7 @@ public class WebServer {
             }
             ResponseMessage msg = new ResponseMessage(200); 
             msg.write(os); 
-            os.write("Team 23: ".getBytes()); 
+            os.write("Team 13: ".getBytes()); 
  
         conn.close();
             }
