@@ -10,13 +10,14 @@ import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.*;
+import java.util.Date;
 
 public class WebServer {
 
     private int port;
     private String rootDir;
     private boolean logging;
+    Date date = new Date();
 
     public WebServer(int port, String rootDir, boolean logging) {
         this.port = port;
@@ -35,44 +36,93 @@ public class WebServer {
             //extract HTTP message from stream
             RequestMessage req = RequestMessage.parse(is);
             OutputStream os = conn.getOutputStream(); 
-
             String methName = req.getMethod();
             String URI = req.getURI();
+            String pathname = rootDir + URI;
+            Path Fullpath = Paths.get(pathname);
+            Path AllPath = Fullpath.toAbsolutePath().normalize();
             if ("GET".equals(methName)){
                 ResponseMessage msg = new ResponseMessage(200); 
             String uri =  URLDecoder.decode(URI,"ASCII");
             Path path = Paths.get(rootDir).resolve(uri).normalize(); 
             if (!path.startsWith(Paths.get(rootDir))){
+                try{
             ResponseMessage msgBroken = new ResponseMessage(400); 
-            msg.write(os); 
-            os.write(" Request is bad ".getBytes());
-            }
+            msgBroken.write(os);   
             byte[] b = Files.readAllBytes(path);
+            os.write(" Request is bad ".getBytes());
             os.write(b);
+            }
+            catch
+            (IOException x) {
+            System.err.format("IOException: %s%n", x);
+            }
+            }
+               
+            if (path.startsWith(rootDir)&& uri.equals(URI)){
+            InputStream thefile = Files.newInputStream(AllPath); 
+                    while (true) {
+                        int a = thefile.read();
+                        if (a == -1) {
+                            break;
+                        }
+                        ResponseMessage FileObtained = new ResponseMessage(400); 
+                        FileObtained.write(os);   
+                         byte[] b = Files.readAllBytes(path);
+                         os.write(" File Obtained:".getBytes());
+                         os.write(b);
+                         os.write(a);              
+            }
+            }
+            }
             
-            if (path.startsWith(rootDir)&& !uri.equals(URI)){
-                Path p1 = Paths.get(System.getProperty("user.home"),uri).normalize();
-                byte[] a = Files.readAllBytes(p1);
-                os.write(a);              
-            }
-            }
             if ("HEAD".equals(methName)){
-                ResponseMessage msg = new ResponseMessage(200); 
+                ResponseMessage head = new ResponseMessage(200);
+                head.getHeaderFieldValue("Connection");
+                head.addHeaderField("Date",date.toString());
+                head.getHeaderFieldValue("Status");
+                head.getHeaderFieldValue("Server");
+               
+                head.write(os);
+                //os.write(" Weclome to Group 42 server ".getBytes());;
+                
+
+                conn.close();
             }
             if ("PUT".equals(methName)){
-                ResponseMessage msg = new ResponseMessage(201);
+                  OutputStream putfile = Files.newOutputStream(AllPath);
+                int count = 0;
+                while (true) {
+                    int c = is.read();
+                    if (c == -1) {
+                        break;
+                    }
+                    String uri =  URLDecoder.decode(URI,"ASCII");
+                    Path path = Paths.get(rootDir).resolve(uri).normalize(); 
+                    byte[] d = Files.readAllBytes(path);
+                     os.write(" File Created:".getBytes());
+                    putfile.write(d);
+                    ++count;
+                }
+                putfile.close();
+                ResponseMessage putresp = new ResponseMessage(201);
+                putresp.write(os);
+                //os.write(" Weclome to Group 42 server ".getBytes());
+
+                
+                conn.close();
             }
+            
             else{
                ResponseMessage msg = new ResponseMessage(500);  
             }
             // get the output stream for sending data to the client 
             ResponseMessage msg = new ResponseMessage(200); 
             msg.write(os); 
-            os.write(" a message of your choosing ".getBytes()); 
+            os.write("Team 23: ".getBytes()); 
  
         conn.close();
-        }
-
+            }
     }
 
     public static void main (String[] args) throws IOException, MessageFormatException {
